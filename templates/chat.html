@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with Document</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: rgba(31, 41, 55, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      font-weight: 600;
+      font-size: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    header span {
+      color: #60a5fa;
+    }
+
+    #chatBox {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      line-height: 1.6;
+      word-wrap: break-word;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f3f4f6;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom-left-radius: 4px;
+      white-space: pre-wrap;
+    }
+
+    .loading {
+      font-style: italic;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(31, 41, 55, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      color: #111;
+    }
+
+    .input-area button {
+      margin-left: 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 12px 22px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .input-area button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    }
+
+    .input-area button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Scrollbar */
+    #chatBox::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #chatBox::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+
+    #chatBox::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      header {
+        font-size: 18px;
+        text-align: center;
+      }
+      .input-area {
+        flex-direction: column;
+      }
+      .input-area button {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    💬 Chat with <span>{{ filename }}</span>
+  </header>
+
+  <div id="chatBox">
+    <div class="message bot">
+      👋 Hi! I’ve analyzed your document. Ask me anything about it — summaries, MCQs, or key concepts.
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="questionInput" placeholder="Type your question..." autocomplete="off" />
+    <button id="sendBtn" onclick="askQuestion()">Send</button>
+  </div>
+
+  <script>
+    const filename = "{{ filename }}";
+
+    async function askQuestion() {
+      const input = document.getElementById("questionInput");
+      const chatBox = document.getElementById("chatBox");
+      const sendBtn = document.getElementById("sendBtn");
+      const question = input.value.trim();
+
+      if (!question) return;
+
+      input.disabled = true;
+      sendBtn.disabled = true;
+      sendBtn.textContent = "...";
+
+      const userMsg = document.createElement("div");
+      userMsg.classList.add("message", "user");
+      userMsg.textContent = question;
+      chatBox.appendChild(userMsg);
+      input.value = "";
+
+      const loadingMsg = document.createElement("div");
+      loadingMsg.classList.add("message", "bot", "loading");
+      loadingMsg.textContent = "Thinking...";
+      chatBox.appendChild(loadingMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ question, filename })
+        });
+
+        const data = await response.json();
+        loadingMsg.remove();
+
+        const botMsg = document.createElement("div");
+        botMsg.classList.add("message", "bot");
+        botMsg.textContent = data.answer;
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        loadingMsg.remove();
+        const errorMsg = document.createElement("div");
+        errorMsg.classList.add("message", "bot");
+        errorMsg.textContent = "❌ Sorry, something went wrong. Try again.";
+        chatBox.appendChild(errorMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      input.disabled = false;
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Send";
+      input.focus();
+    }
+
+    document.getElementById("questionInput").addEventListener("keypress", e => {
+      if (e.key === "Enter") askQuestion();
+    });
+  </script>
+</body>
+</html>

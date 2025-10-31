@@ -1,0 +1,14 @@
+flask
+python-dotenv
+PyPDF2
+langchain
+langchain-community
+langchain-groq
+faiss-cpu
+torch
+sentence-transformers
+python-docx
+python-pptx
+pdfplumber
+pytesseract
+Pillow

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Document Q&A - Upload</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="upload-page">
+  <div class="upload-card">
+    <h1>📄 AI Document Q&A</h1>
+    <p>Upload your document (PDF, Word, or PowerPoint) and start asking questions</p>
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+      <input type="file" id="fileInput" name="document" accept=".pdf,.docx,.doc,.pptx,.ppt" required>
+      <label for="fileInput" class="upload-btn">Choose Document</label>
+      <p id="fileName"></p>
+      <div class="supported-formats">
+        <small>Supported formats: PDF, Word (docx/doc), PowerPoint (pptx/ppt)</small>
+      </div>
+      <button type="submit" class="continue-btn" id="uploadBtn">Upload & Continue</button>
+    </form>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const fileName = document.getElementById("fileName");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const uploadForm = document.getElementById("uploadForm");
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Get file extension
+        const ext = file.name.split('.').pop().toLowerCase();
+        
+        // Add emoji based on file type
+        let emoji = "📄";
+        if (ext === "pdf") emoji = "📕";
+        else if (ext === "docx" || ext === "doc") emoji = "📘";
+        else if (ext === "pptx" || ext === "ppt") emoji = "📊";
+        
+        fileName.textContent = `${emoji} Selected: ${file.name}`;
+        fileName.style.color = "#10b981";
+      } else {
+        fileName.textContent = "";
+      }
+    });
+
+    uploadForm.addEventListener("submit", (e) => {
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = "Processing...";
+    });
+  </script>
+</body>
+</html>

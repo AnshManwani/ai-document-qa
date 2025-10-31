@@ -1,0 +1,14 @@
+
+---
+
+## 🪄 Step 5: Upload to GitHub
+1. Open **Git Bash** or your terminal inside the project folder.  
+2. Run these commands:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit: AI Document Q&A Assistant"
+git branch -M main
+git remote add origin https://github.com/AnshManwani/ai-document-qa.git
+git push -u origin main
