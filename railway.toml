@@ -1,6 +1,0 @@
-﻿[service]
-name = "web"
-startCommand = "python main.py"
-
-[deploy]
-buildCommand = "pip install -r requirements.txt"
