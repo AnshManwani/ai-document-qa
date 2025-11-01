@@ -3,7 +3,7 @@ langchain==0.1.5
 langchain-community==0.0.20
 langchain-groq==0.1.0
 langchain-google-genai==0.0.11
-faiss-cpu==1.7.4
+faiss-cpu
 python-docx==1.1.0
 pdfplumber==0.10.3
 pypdf==3.17.4
