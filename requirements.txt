@@ -1,12 +1,9 @@
-flask==2.3.3
+﻿flask==2.3.3
 langchain==0.1.5
 langchain-community==0.0.20
 langchain-groq==0.1.0
 langchain-google-genai==0.0.11
-langchain-core==0.1.53
 faiss-cpu==1.7.4
-sentence-transformers==2.2.2
 python-docx==1.1.0
-python-pptx==0.6.23
 pdfplumber==0.10.3
 pypdf==3.17.4
