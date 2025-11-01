@@ -1,13 +1,11 @@
 flask==2.3.3
+gunicorn
 pypdf
 langchain
 langchain-community
 langchain-groq
+langchain-google-genai
 faiss-cpu
-sentence-transformers
 python-docx
-python-pptx
 pdfplumber
-torch
-huggingface-hub
-transformers
+python-pptx

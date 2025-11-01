@@ -2,11 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import os
 from pypdf import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings  # Changed import
+from langchain_google_genai import GoogleGenerativeAIEmbeddings  # CHANGED
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage  # Changed import
-import torch
+from langchain_core.messages import HumanMessage
 from docx import Document
 from pptx import Presentation
 import traceback
@@ -21,19 +20,19 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['VECTORSTORE_FOLDER'], exist_ok=True)
 
-# ================= API KEY =================
-# Set your API key securely in Defang:
-# defang config set GROQ_API_KEY=your_key_here
+# ================= API KEYS =================
 groq_api_key = os.getenv("GROQ_API_KEY")
+google_api_key = os.getenv("GOOGLE_API_KEY")  # NEW
+
 if not groq_api_key:
-    raise ValueError("❌ GROQ_API_KEY not found! Set it via 'defang config set GROQ_API_KEY'.")
+    raise ValueError("❌ GROQ_API_KEY not found! Set it in Railway variables.")
+if not google_api_key:
+    raise ValueError("❌ GOOGLE_API_KEY not found! Get free key from: https://makersuite.google.com/app/apikey")
 
 # ================= LOAD MODELS =================
 print("🚀 Loading models...")
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",  # Changed to more reliable model
-    model_kwargs={'device': device}
+embeddings = GoogleGenerativeAIEmbeddings(  # CHANGED - No large downloads!
+    model="models/embedding-001"
 )
 llm = ChatGroq(
     groq_api_key=groq_api_key,
@@ -203,5 +202,6 @@ Your detailed and accurate response:
 if __name__ == '__main__':
     print("\n🌐 Starting Flask App")
     print(f"✓ GROQ API Key: {'Set' if groq_api_key else 'MISSING'}")
+    print(f"✓ Google API Key: {'Set' if google_api_key else 'MISSING'}")
     PORT = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=PORT)
