@@ -1,6 +1,6 @@
-echo '[service]
-name = "web" 
+﻿[service]
+name = "web"
 startCommand = "python main.py"
 
 [deploy]
-buildCommand = "pip install -r requirements.txt"' > railway.toml
+buildCommand = "pip install -r requirements.txt"
