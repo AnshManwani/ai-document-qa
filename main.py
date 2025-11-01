@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import os
 from pypdf import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings  # CHANGED
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage
+from langchain.schema import HumanMessage  # CHANGED: from langchain_core.messages import HumanMessage
 from docx import Document
 from pptx import Presentation
 import traceback
@@ -22,7 +22,7 @@ os.makedirs(app.config['VECTORSTORE_FOLDER'], exist_ok=True)
 
 # ================= API KEYS =================
 groq_api_key = os.getenv("GROQ_API_KEY")
-google_api_key = os.getenv("GOOGLE_API_KEY")  # NEW
+google_api_key = os.getenv("GOOGLE_API_KEY")
 
 if not groq_api_key:
     raise ValueError("❌ GROQ_API_KEY not found! Set it in Railway variables.")
@@ -31,7 +31,7 @@ if not google_api_key:
 
 # ================= LOAD MODELS =================
 print("🚀 Loading models...")
-embeddings = GoogleGenerativeAIEmbeddings(  # CHANGED - No large downloads!
+embeddings = GoogleGenerativeAIEmbeddings(
     model="models/embedding-001"
 )
 llm = ChatGroq(
